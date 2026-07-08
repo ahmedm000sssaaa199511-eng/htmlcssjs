@@ -3,243 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ورشة الويب — المستوى ١: أساسيات HTML</title>
+<title>ورشة الويب — من الصفر إلى الاحتراف</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-deep:#0B1E2D;
-    --bg-panel:#122A40;
-    --bg-panel-2:#173453;
-    --grid-line: rgba(237,232,219,0.06);
-    --line: rgba(237,232,219,0.16);
-    --amber:#F2A93B;
-    --amber-dim:#C98A2C;
-    --paper:#EDE8DB;
-    --dim:#93ABBD;
-    --success:#7FD79B;
-    --error:#E8747C;
+    --bg-deep:#0B1E2D; --bg-panel:#122A40; --bg-panel-2:#173453;
+    --grid-line:rgba(237,232,219,0.06); --line:rgba(237,232,219,0.16);
+    --amber:#F2A93B; --amber-dim:#C98A2C; --paper:#EDE8DB; --dim:#93ABBD;
+    --success:#7FD79B; --error:#E8747C;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--bg-deep);
-    color:var(--paper);
-    font-family:'Cairo',sans-serif;
-    min-height:100vh;
-    position:relative;
-    overflow-x:hidden;
+    background:var(--bg-deep); color:var(--paper); font-family:'Cairo',sans-serif;
+    height:100vh; overflow:hidden; /* الصفحة نفسها لا تتمرر — كل لوحة تتمرر داخلياً */
   }
   .blueprint-grid{
     position:fixed; inset:0; z-index:0; pointer-events:none;
     background-image:
-      repeating-linear-gradient(0deg, var(--grid-line) 0 1px, transparent 1px 40px),
-      repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 40px);
+      repeating-linear-gradient(0deg,var(--grid-line) 0 1px,transparent 1px 40px),
+      repeating-linear-gradient(90deg,var(--grid-line) 0 1px,transparent 1px 40px);
   }
-  .wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:28px 24px 80px;}
+
+  /* ===== التخطيط الرئيسي: لوحتان ===== */
+  .app{
+    position:relative; z-index:1;
+    display:grid;
+    grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); /* يمين: المحتوى | يسار: المحرر (RTL) */
+    height:100vh;
+  }
+  /* اللوحة اليمنى: المحتوى التعليمي — الوحيدة القابلة للتمرير */
+  .content-pane{
+    overflow-y:auto; overscroll-behavior:contain;
+    padding:26px 26px 90px;
+  }
+  /* اللوحة اليسرى: المحرر + المعاينة — ثابتة دائماً */
+  .editor-pane{
+    height:100vh; position:sticky; top:0;
+    display:flex; flex-direction:column; gap:14px;
+    padding:18px 18px 18px 20px;
+    border-inline-start:1px solid var(--line);
+    background:rgba(11,30,45,0.6); backdrop-filter:blur(2px);
+    overflow:hidden;
+  }
 
   /* HEADER */
   header.top{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:20px; padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:22px;
-    flex-wrap:wrap;
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom:20px; flex-wrap:wrap;
   }
   .brand{display:flex; align-items:center; gap:14px;}
   .brand-mark{
     width:52px; height:52px; border-radius:10px;
     background:linear-gradient(160deg,var(--bg-panel-2),var(--bg-panel));
-    border:1px solid var(--amber-dim);
-    display:flex; align-items:center; justify-content:center;
-    font-size:26px; color:var(--amber);
-    box-shadow: inset 0 0 0 1px rgba(242,169,59,0.15);
+    border:1px solid var(--amber-dim); display:flex; align-items:center; justify-content:center;
+    font-size:26px; color:var(--amber); box-shadow:inset 0 0 0 1px rgba(242,169,59,0.15);
   }
-  .brand h1{margin:0; font-size:1.5rem; font-weight:800; letter-spacing:.3px;}
-  .brand .tagline{margin:2px 0 0; font-size:.85rem; color:var(--dim); font-weight:600;}
+  .brand h1{margin:0; font-size:1.4rem; font-weight:800; letter-spacing:.3px;}
+  .brand .tagline{margin:2px 0 0; font-size:.82rem; color:var(--dim); font-weight:600;}
 
   .compass{display:flex; align-items:center; gap:12px;}
   .compass svg{transform:rotate(-90deg);}
   .compass-ring-bg{fill:none; stroke:rgba(237,232,219,0.1); stroke-width:8;}
-  .compass-ring-fg{fill:none; stroke:var(--amber); stroke-width:8; stroke-linecap:round;
-    transition:stroke-dashoffset .5s ease;}
+  .compass-ring-fg{fill:none; stroke:var(--amber); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .5s ease;}
   .compass-box{position:relative; width:74px; height:74px;}
-  .compass-label{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    flex-direction:column; font-family:'JetBrains Mono',monospace; font-size:.95rem; font-weight:700;
-  }
+  .compass-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; font-family:'JetBrains Mono',monospace; font-size:.95rem; font-weight:700;}
   .compass-label small{font-size:.6rem; color:var(--dim); font-weight:500;}
-  .compass-text{font-size:.8rem; color:var(--dim); font-weight:600; max-width:120px;}
+  .compass-text{font-size:.78rem; color:var(--dim); font-weight:600; max-width:130px;}
 
   /* ROADMAP */
-  nav.roadmap ol{
-    list-style:none; margin:0 0 28px; padding:0; display:flex; gap:10px; flex-wrap:wrap;
-  }
+  nav.roadmap ol{list-style:none; margin:0 0 24px; padding:0; display:flex; gap:8px; flex-wrap:wrap;}
   nav.roadmap li{
-    flex:1 1 140px; display:flex; align-items:center; gap:8px;
+    flex:1 1 120px; display:flex; align-items:center; gap:8px;
     background:var(--bg-panel); border:1px solid var(--line); border-radius:9px;
-    padding:10px 12px; font-size:.8rem; font-weight:700; color:var(--dim);
+    padding:9px 11px; font-size:.75rem; font-weight:700; color:var(--dim);
+    cursor:pointer; transition:border-color .2s;
   }
-  nav.roadmap li .num{
-    font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--dim);
-    background:rgba(237,232,219,0.06); padding:2px 6px; border-radius:5px;
-  }
-  nav.roadmap li.active{
-    border-color:var(--amber); color:var(--paper); background:rgba(242,169,59,0.08);
-  }
+  nav.roadmap li:hover:not(.locked){border-color:var(--amber);}
+  nav.roadmap li .num{font-family:'JetBrains Mono',monospace; font-size:.68rem; background:rgba(237,232,219,0.06); padding:2px 6px; border-radius:5px;}
+  nav.roadmap li.active{border-color:var(--amber); color:var(--paper); background:rgba(242,169,59,0.08);}
   nav.roadmap li.active .num{background:var(--amber); color:var(--bg-deep);}
-  nav.roadmap li.locked{opacity:.5;}
+  nav.roadmap li.done-level .num{background:var(--success); color:var(--bg-deep);}
+  nav.roadmap li.locked{opacity:.45; cursor:not-allowed;}
 
-  h2{font-size:1.25rem; font-weight:800; margin:0 0 12px; color:var(--paper);}
+  h2{font-size:1.2rem; font-weight:800; margin:0 0 12px; color:var(--paper);}
   h2 .eyebrow{display:block; font-size:.7rem; letter-spacing:2px; color:var(--amber); font-weight:700; margin-bottom:6px;}
   h3{font-size:1rem; font-weight:700; margin:20px 0 10px; color:var(--paper);}
-  p{line-height:1.9; color:var(--dim); font-size:.95rem;}
-  code{
-    font-family:'JetBrains Mono',monospace; direction:ltr; display:inline-block;
-    background:rgba(242,169,59,0.1); color:var(--amber); padding:1px 6px; border-radius:5px; font-size:.85em;
-  }
-  pre{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
-    padding:14px 16px; overflow-x:auto; direction:ltr; text-align:left;
-  }
-  pre code{background:none; padding:0; color:var(--paper); font-size:.85rem; line-height:1.7;}
+  p{line-height:1.9; color:var(--dim); font-size:.93rem;}
+  strong{color:var(--paper);}
+  code{font-family:'JetBrains Mono',monospace; direction:ltr; display:inline-block; background:rgba(242,169,59,0.1); color:var(--amber); padding:1px 6px; border-radius:5px; font-size:.85em;}
+  pre{background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; padding:13px 15px; overflow-x:auto; direction:ltr; text-align:left; margin:10px 0;}
+  pre code{background:none; padding:0; color:var(--paper); font-size:.82rem; line-height:1.7;}
 
-  /* LAYOUT */
-  main.layout{
-    display:grid; grid-template-columns:1fr 1.15fr; gap:22px; align-items:start; margin-bottom:32px;
-  }
-  @media (max-width:880px){ main.layout{grid-template-columns:1fr;} }
+  .lesson,section.exercises{background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:20px;}
 
-  .lesson{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:24px;
-  }
-  .tag-list{list-style:none; margin:0; padding:0; display:grid; gap:8px;}
-  .tag-list li{
-    display:flex; align-items:center; gap:10px; font-size:.85rem; color:var(--paper);
-    background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:8px; padding:8px 10px;
-  }
+  .example-card{background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:12px; padding:14px 16px 16px; margin-bottom:14px;}
+  .example-card h4{margin:0 0 4px; font-size:.9rem; font-weight:800; display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .example-card .ex-note{display:block; font-size:.78rem; color:var(--dim); margin-bottom:8px; line-height:1.6;}
+  .example-card pre{margin:0 0 10px; padding:10px 12px; font-size:.76rem;}
+  .example-card .ex-label{font-size:.66rem; font-weight:800; letter-spacing:1px; color:var(--amber); margin-bottom:6px; text-transform:uppercase;}
+  .example-preview-frame{width:100%; min-height:64px; border:1px dashed var(--line); border-radius:8px; background:#fff; display:block;}
 
-  .example-card{
-    background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:12px;
-    padding:14px 16px 16px; margin-bottom:14px;
-  }
-  .example-card h4{
-    margin:0 0 4px; font-size:.92rem; font-weight:800; color:var(--paper); display:flex; gap:6px; align-items:center;
-  }
-  .example-card h4 code{font-size:.9em;}
-  .example-card .ex-note{display:block; font-size:.78rem; color:var(--dim); margin-bottom:10px; line-height:1.6;}
-  .example-card pre{margin:0 0 10px; padding:10px 12px; font-size:.78rem;}
-  .example-card .ex-label{
-    font-size:.68rem; font-weight:800; letter-spacing:1px; color:var(--amber);
-    margin-bottom:6px; text-transform:uppercase;
-  }
-  .example-preview-frame{
-    width:100%; min-height:64px; border:1px dashed var(--line); border-radius:8px;
-    background:#fff; display:block;
-  }
-
-  .playground{display:grid; gap:14px;}
-  .panel{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; overflow:hidden;
-  }
+  /* ===== لوحة المحرر (ثابتة) ===== */
+  .editor-pane .panel{background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; flex:1; min-height:0;}
   .panel-head{
     display:flex; align-items:center; justify-content:space-between;
-    padding:10px 14px; background:var(--bg-panel-2); font-size:.78rem; font-weight:700; color:var(--dim);
-    border-bottom:1px solid var(--line);
+    padding:9px 14px; background:var(--bg-panel-2); font-size:.76rem; font-weight:700; color:var(--dim);
+    border-bottom:1px solid var(--line); flex:none;
   }
-  .panel-head button{
-    background:none; border:1px solid var(--line); color:var(--dim); border-radius:6px;
-    padding:4px 10px; font-family:'Cairo',sans-serif; font-size:.72rem; font-weight:700; cursor:pointer;
-  }
+  .panel-head button{background:none; border:1px solid var(--line); color:var(--dim); border-radius:6px; padding:4px 10px; font-family:'Cairo',sans-serif; font-size:.7rem; font-weight:700; cursor:pointer;}
   .panel-head button:hover{border-color:var(--amber); color:var(--amber);}
-
   #codeInput{
-    width:100%; min-height:220px; resize:vertical; border:0; outline:0;
+    flex:1; min-height:0; width:100%; resize:none; border:0; outline:0;
     background:#0E2233; color:var(--paper); font-family:'JetBrains Mono',monospace;
-    font-size:.82rem; line-height:1.7; padding:16px; direction:ltr; text-align:left;
+    font-size:.82rem; line-height:1.7; padding:14px; direction:ltr; text-align:left;
   }
-  .preview-panel .panel-head::before{content:"● ● ●"; letter-spacing:3px; color:var(--dim); font-size:.6rem;}
-  #preview{width:100%; height:236px; border:0; background:#fff; display:block;}
+  .preview-panel .panel-head::before{content:"● ● ●"; letter-spacing:3px; font-size:.6rem;}
+  #preview{flex:1; min-height:0; width:100%; border:0; background:#fff; display:block;}
 
   /* EXERCISES */
-  section.exercises{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:24px;
-  }
   .exercise-grid{display:grid; gap:10px; margin:16px 0 18px;}
-  .exercise{
-    display:flex; align-items:flex-start; gap:12px; padding:12px 14px;
-    background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:10px;
-    transition:border-color .3s, background .3s;
-  }
+  .exercise{display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:10px; transition:border-color .3s, background .3s;}
   .exercise.done{border-color:var(--success); background:rgba(127,215,155,0.08);}
-  .exercise .status{
-    width:26px; height:26px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
-    background:rgba(237,232,219,0.08); font-size:.8rem; font-weight:800; color:var(--dim);
-    font-family:'JetBrains Mono',monospace;
-  }
+  .exercise .status{width:26px; height:26px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; background:rgba(237,232,219,0.08); font-size:.8rem; font-weight:800; color:var(--dim); font-family:'JetBrains Mono',monospace;}
   .exercise.done .status{background:var(--success); color:var(--bg-deep);}
-  .exercise .body strong{display:block; font-size:.9rem; color:var(--paper); margin-bottom:2px;}
-  .exercise .body span{font-size:.8rem; color:var(--dim);}
-  .exercise .body code{margin:0 2px;}
+  .exercise .body strong{display:block; font-size:.88rem; margin-bottom:2px;}
+  .exercise .body span{font-size:.78rem; color:var(--dim);}
 
   .actions{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
-  #checkBtn{
-    background:var(--amber); color:var(--bg-deep); border:0; border-radius:9px;
-    padding:12px 22px; font-family:'Cairo',sans-serif; font-weight:800; font-size:.9rem; cursor:pointer;
-  }
-  #checkBtn:hover{background:#ffbf5a;}
-  #checkStatus{font-size:.82rem; color:var(--dim); font-weight:600;}
+  #checkBtn,.next-btn{background:var(--amber); color:var(--bg-deep); border:0; border-radius:9px; padding:11px 22px; font-family:'Cairo',sans-serif; font-weight:800; font-size:.88rem; cursor:pointer;}
+  #checkBtn:hover,.next-btn:hover{background:#ffbf5a;}
+  #checkStatus{font-size:.8rem; color:var(--dim); font-weight:600;}
 
-  .congrats{
-    margin-top:18px; padding:18px 20px; border-radius:12px;
-    background:linear-gradient(120deg, rgba(242,169,59,0.14), rgba(127,215,155,0.1));
-    border:1px solid var(--amber);
-  }
+  .congrats{margin-top:18px; padding:18px 20px; border-radius:12px; background:linear-gradient(120deg,rgba(242,169,59,0.14),rgba(127,215,155,0.1)); border:1px solid var(--amber);}
   .congrats h3{margin:0 0 6px; color:var(--amber);}
-  .congrats p{color:var(--paper); margin:0;}
+  .congrats p{color:var(--paper); margin:0 0 12px;}
+
+  /* ===== التجاوب ===== */
+  @media (max-width:960px){
+    body{overflow:auto; height:auto;}
+    .app{display:block; height:auto;}
+    .content-pane{overflow:visible; padding-bottom:20px;}
+    .editor-pane{
+      position:sticky; bottom:0; top:auto; height:52vh; z-index:5;
+      border-inline-start:0; border-top:2px solid var(--amber-dim);
+      background:var(--bg-deep);
+    }
+  }
 </style>
 </head>
 <body>
 <div class="blueprint-grid"></div>
-<div class="wrap">
 
-  <header class="top">
-    <div class="brand">
-      <div class="brand-mark">⌁</div>
-      <div>
-        <h1>ورشة الويب</h1>
-        <p class="tagline">من الصفر إلى الاحتراف — HTML · CSS · JavaScript</p>
+<div class="app">
+
+  <!-- ===== اللوحة اليمنى: المحتوى (قابلة للتمرير) ===== -->
+  <div class="content-pane">
+    <header class="top">
+      <div class="brand">
+        <div class="brand-mark">⌁</div>
+        <div>
+          <h1>ورشة الويب</h1>
+          <p class="tagline">من الصفر إلى الاحتراف — HTML · CSS · JavaScript</p>
+        </div>
       </div>
-    </div>
-    <div class="compass">
-      <div class="compass-box">
-        <svg width="74" height="74" viewBox="0 0 74 74">
-          <circle class="compass-ring-bg" cx="37" cy="37" r="30"></circle>
-          <circle id="ring" class="compass-ring-fg" cx="37" cy="37" r="30"
-            stroke-dasharray="188.4" stroke-dashoffset="188.4"></circle>
-        </svg>
-        <div class="compass-label"><span id="progressCount">0</span><small>من 5</small></div>
+      <div class="compass">
+        <div class="compass-box">
+          <svg width="74" height="74" viewBox="0 0 74 74">
+            <circle class="compass-ring-bg" cx="37" cy="37" r="30"></circle>
+            <circle id="ring" class="compass-ring-fg" cx="37" cy="37" r="30" stroke-dasharray="188.4" stroke-dashoffset="188.4"></circle>
+          </svg>
+          <div class="compass-label"><span id="progressCount">0</span><small>من <span id="progressTotal">5</span></small></div>
+        </div>
+        <div class="compass-text">تقدّمك في تحديات المستوى الحالي</div>
       </div>
-      <div class="compass-text">تقدّمك في تحديات المستوى الأول</div>
+    </header>
+
+    <nav class="roadmap"><ol id="roadmap"></ol></nav>
+
+    <section class="lesson" id="lessonBox"></section>
+
+    <section class="exercises">
+      <h2><span class="eyebrow">تطبيق عملي</span><span id="exTitle">التحديات</span></h2>
+      <p style="margin-top:-6px;">أكمل الكود في المحرر المثبّت يسارًا حتى تُحقق كل تحدٍ، ثم اضغط "تحقق من الحل".</p>
+      <div class="exercise-grid" id="exerciseGrid"></div>
+      <div class="actions">
+        <button id="checkBtn">تحقق من الحل ✅</button>
+        <span id="checkStatus"></span>
+      </div>
+      <div class="congrats" id="congrats" hidden>
+        <h3>🎉 أحسنت! أنهيت هذا المستوى</h3>
+        <p id="congratsText"></p>
+        <button class="next-btn" id="nextBtn">المستوى التالي ←</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== اللوحة اليسرى: المحرر + المعاينة (ثابتة) ===== -->
+  <aside class="editor-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <span>✎ محرر الكود — <span id="editorLevelName"></span></span>
+        <button id="resetBtn">إعادة تعيين</button>
+      </div>
+      <textarea id="codeInput" dir="ltr" spellcheck="false"></textarea>
     </div>
-  </header>
+    <div class="panel preview-panel">
+      <div class="panel-head"><span>المعاينة الحية</span></div>
+      <iframe id="preview" title="معاينة حية"></iframe>
+    </div>
+  </aside>
 
-  <nav class="roadmap">
-    <ol>
-      <li class="active"><span class="num">01</span>أساسيات HTML</li>
-      <li class="locked"><span class="num">02</span>HTML متقدم</li>
-      <li class="locked"><span class="num">03</span>أساسيات CSS</li>
-      <li class="locked"><span class="num">04</span>CSS متقدم</li>
-      <li class="locked"><span class="num">05</span>جافاسكريبت</li>
-      <li class="locked"><span class="num">06</span>مشروع التخرج</li>
-    </ol>
-  </nav>
+</div>
 
-  <main class="layout">
-    <section class="lesson">
-      <h2><span class="eyebrow">الدرس ١.١</span>ما هي HTML؟</h2>
-      <p>HTML (لغة ترميز النص التشعبي) ليست لغة برمجة، بل لغة <strong style="color:var(--paper)">هيكلة</strong>. مهمتها الوحيدة هي إخبار المتصفح: "هذا عنوان، هذه فقرة، هذه صورة". كل شيء تراه في أي موقع ويب مبني فوق هيكل HTML، تمامًا كما يُبنى البيت فوق مخطط هندسي.</p>
-
-      <h3>البنية الأساسية لأي صفحة</h3>
-      <pre><code>&lt;!DOCTYPE html&gt;
+<script>
+/* ================================================================
+   بيانات المستويات — كل مستوى: درس + كود بداية + تحديات مع تحقق آلي
+   ================================================================ */
+const LEVELS = [
+{
+  id:1, name:"أساسيات HTML", eyebrow:"الدرس ١",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ١</span>ما هي HTML؟</h2>
+    <p>HTML ليست لغة برمجة، بل لغة <strong>هيكلة</strong>. مهمتها إخبار المتصفح: "هذا عنوان، هذه فقرة، هذه صورة". كل موقع ويب مبني فوق هيكل HTML كما يُبنى البيت فوق مخطط هندسي.</p>
+    <h3>البنية الأساسية لأي صفحة</h3>
+    <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
     &lt;title&gt;عنوان الصفحة&lt;/title&gt;
@@ -248,202 +237,534 @@
     &lt;!-- المحتوى الذي يظهر للزائر --&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
-
-      <h3>عناصر اليوم — مع مثال كامل لكل عنصر</h3>
-      <p style="margin-top:-4px;">كل بطاقة تحتها تحتوي الكود على اليمين والناتج الفعلي كما يظهر في المتصفح تحته مباشرة.</p>
-
-      <div class="example-card">
-        <h4><code>&lt;h1&gt;</code> — عنوان رئيسي</h4>
-        <span class="ex-note">يُستخدم مرة واحدة فقط في الصفحة، وهو أهم عنوان فيها.</span>
-        <pre><code>&lt;h1&gt;مرحبًا، أنا محمد&lt;/h1&gt;</code></pre>
-        <div class="ex-label">الناتج</div>
-        <iframe class="example-preview-frame" title="مثال h1" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;h1 style='margin:0;font-size:22px;'&gt;مرحبًا، أنا محمد&lt;/h1&gt;&lt;/body&gt;"></iframe>
-      </div>
-
-      <div class="example-card">
-        <h4><code>&lt;p&gt;</code> — فقرة نصية</h4>
-        <span class="ex-note">لأي كتلة نص عادية: جملة، وصف، تعريف.</span>
-        <pre><code>&lt;p&gt;أنا مطوّر ويب مبتدئ أتعلم HTML وCSS وJavaScript.&lt;/p&gt;</code></pre>
-        <div class="ex-label">الناتج</div>
-        <iframe class="example-preview-frame" title="مثال p" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;p style='margin:0;'&gt;أنا مطوّر ويب مبتدئ أتعلم HTML وCSS وJavaScript.&lt;/p&gt;&lt;/body&gt;"></iframe>
-      </div>
-
-      <div class="example-card">
-        <h4><code>&lt;a href="..."&gt;</code> — رابط تشعبي</h4>
-        <span class="ex-note">خاصية <code>href</code> إجبارية، وهي تحدد وجهة الرابط.</span>
-        <pre><code>&lt;a href="https://www.google.com"&gt;اذهب إلى جوجل&lt;/a&gt;</code></pre>
-        <div class="ex-label">الناتج (قابل للنقر)</div>
-        <iframe class="example-preview-frame" title="مثال a" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;a href='https://www.google.com' style='color:#1a56db;'&gt;اذهب إلى جوجل&lt;/a&gt;&lt;/body&gt;"></iframe>
-      </div>
-
-      <div class="example-card">
-        <h4><code>&lt;ul&gt;</code> / <code>&lt;li&gt;</code> — قائمة غير مرتبة</h4>
-        <span class="ex-note"><code>ul</code> هي الحاوية، و<code>li</code> كل عنصر بداخلها.</span>
-        <pre><code>&lt;ul&gt;
+    <div class="example-card">
+      <h4><code>&lt;h1&gt;</code> — عنوان رئيسي</h4>
+      <span class="ex-note">يُستخدم مرة واحدة فقط في الصفحة، وهو أهم عنوان فيها.</span>
+      <pre><code>&lt;h1&gt;مرحبًا، أنا محمد&lt;/h1&gt;</code></pre>
+      <div class="ex-label">الناتج</div>
+      <iframe class="example-preview-frame" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;h1 style='margin:0;font-size:22px;'&gt;مرحبًا، أنا محمد&lt;/h1&gt;&lt;/body&gt;"></iframe>
+    </div>
+    <div class="example-card">
+      <h4><code>&lt;p&gt;</code> — فقرة نصية</h4>
+      <span class="ex-note">لأي كتلة نص عادية: جملة، وصف، تعريف.</span>
+      <pre><code>&lt;p&gt;أنا مطوّر ويب مبتدئ.&lt;/p&gt;</code></pre>
+      <div class="ex-label">الناتج</div>
+      <iframe class="example-preview-frame" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;p style='margin:0;'&gt;أنا مطوّر ويب مبتدئ.&lt;/p&gt;&lt;/body&gt;"></iframe>
+    </div>
+    <div class="example-card">
+      <h4><code>&lt;a href="..."&gt;</code> — رابط تشعبي</h4>
+      <span class="ex-note">خاصية <code>href</code> إجبارية وتحدد وجهة الرابط.</span>
+      <pre><code>&lt;a href="https://www.google.com"&gt;اذهب إلى جوجل&lt;/a&gt;</code></pre>
+      <div class="ex-label">الناتج (قابل للنقر)</div>
+      <iframe class="example-preview-frame" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;a href='https://www.google.com' style='color:#1a56db;'&gt;اذهب إلى جوجل&lt;/a&gt;&lt;/body&gt;"></iframe>
+    </div>
+    <div class="example-card">
+      <h4><code>&lt;ul&gt;</code> / <code>&lt;li&gt;</code> — قائمة</h4>
+      <span class="ex-note"><code>ul</code> الحاوية، و<code>li</code> كل عنصر بداخلها.</span>
+      <pre><code>&lt;ul&gt;
   &lt;li&gt;القراءة&lt;/li&gt;
   &lt;li&gt;البرمجة&lt;/li&gt;
-  &lt;li&gt;الرياضة&lt;/li&gt;
 &lt;/ul&gt;</code></pre>
-        <div class="ex-label">الناتج</div>
-        <iframe class="example-preview-frame" title="مثال ul" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;ul style='margin:0;padding-inline-start:20px;'&gt;&lt;li&gt;القراءة&lt;/li&gt;&lt;li&gt;البرمجة&lt;/li&gt;&lt;li&gt;الرياضة&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;"></iframe>
-      </div>
-
-      <div class="example-card">
-        <h4><code>&lt;img src="..." alt="..."&gt;</code> — صورة</h4>
-        <span class="ex-note">وسم بلا إغلاق. <code>src</code> مصدر الصورة، <code>alt</code> نص بديل لو لم تُحمّل.</span>
-        <pre><code>&lt;img src="https://placehold.co/300x120"
-     alt="صورة توضيحية"&gt;</code></pre>
-        <div class="ex-label">الناتج</div>
-        <iframe class="example-preview-frame" title="مثال img" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;img src='https://placehold.co/300x120' alt='صورة توضيحية' style='max-width:100%;border-radius:6px;'&gt;&lt;/body&gt;"></iframe>
-      </div>
-
-      <h3>ملاحظة مهمة</h3>
-      <p>كل وسم (Tag) عادة له بداية <code>&lt;p&gt;</code> ونهاية <code>&lt;/p&gt;</code>. المحتوى يوضع بينهما. جرّب الآن في المحرر المجاور 👉</p>
-    </section>
-
-    <div class="playground">
-      <div class="panel">
-        <div class="panel-head">
-          <span>✎ محرر الكود</span>
-          <button id="resetBtn">إعادة تعيين</button>
-        </div>
-        <textarea id="codeInput" dir="ltr" spellcheck="false"><!DOCTYPE html>
-<html>
-<head>
-  <title>صفحتي الأولى</title>
-</head>
-<body>
-  <!-- اكتب كودك هنا -->
-
-</body>
-</html></textarea>
-      </div>
-      <div class="panel preview-panel">
-        <div class="panel-head"><span>المعاينة الحية</span></div>
-        <iframe id="preview" title="معاينة حية"></iframe>
-      </div>
+      <div class="ex-label">الناتج</div>
+      <iframe class="example-preview-frame" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;ul style='margin:0;padding-inline-start:20px;'&gt;&lt;li&gt;القراءة&lt;/li&gt;&lt;li&gt;البرمجة&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;"></iframe>
     </div>
-  </main>
-
-  <section class="exercises">
-    <h2><span class="eyebrow">تطبيق عملي</span>تحديات المستوى الأول</h2>
-    <p style="margin-top:-6px;">أكمل الكود في المحرر أعلاه حتى تُحقق كل تحدٍ، ثم اضغط "تحقق من الحل".</p>
-
-    <div class="exercise-grid" id="exerciseGrid">
-      <div class="exercise" data-ex="1">
-        <div class="status">1</div>
-        <div class="body"><strong>عنوان باسمك</strong><span>أضف <code>&lt;h1&gt;</code> يحتوي على اسمك.</span></div>
-      </div>
-      <div class="exercise" data-ex="2">
-        <div class="status">2</div>
-        <div class="body"><strong>فقرة تعريفية</strong><span>أضف <code>&lt;p&gt;</code> تصف نفسك في جملة واحدة.</span></div>
-      </div>
-      <div class="exercise" data-ex="3">
-        <div class="status">3</div>
-        <div class="body"><strong>رابط</strong><span>أضف <code>&lt;a href="..."&gt;</code> يشير لموقعك المفضل.</span></div>
-      </div>
-      <div class="exercise" data-ex="4">
-        <div class="status">4</div>
-        <div class="body"><strong>قائمة</strong><span>أضف <code>&lt;ul&gt;</code> بها 3 عناصر <code>&lt;li&gt;</code> على الأقل (مثلاً هواياتك).</span></div>
-      </div>
-      <div class="exercise" data-ex="5">
-        <div class="status">5</div>
-        <div class="body"><strong>صورة</strong><span>أضف <code>&lt;img src="..." alt="..."&gt;</code> بخاصيتي src وalt.</span></div>
-      </div>
+    <div class="example-card">
+      <h4><code>&lt;img src alt&gt;</code> — صورة</h4>
+      <span class="ex-note">وسم بلا إغلاق. <code>src</code> المصدر، <code>alt</code> نص بديل.</span>
+      <pre><code>&lt;img src="https://placehold.co/300x120" alt="صورة توضيحية"&gt;</code></pre>
+      <div class="ex-label">الناتج</div>
+      <iframe class="example-preview-frame" srcdoc="&lt;body style='margin:0;padding:10px;'&gt;&lt;img src='https://placehold.co/300x120' alt='صورة' style='max-width:100%;border-radius:6px;'&gt;&lt;/body&gt;"></iframe>
     </div>
-
-    <div class="actions">
-      <button id="checkBtn">تحقق من الحل ✅</button>
-      <span id="checkStatus"></span>
+    <p>كل وسم له بداية <code>&lt;p&gt;</code> ونهاية <code>&lt;/p&gt;</code>. جرّب الآن في المحرر الثابت يسارًا — لن يختفي مهما مرّرت الصفحة 👈</p>`,
+  starter:'<!DOCTYPE html>\n<html>\n<head>\n  <title>صفحتي الأولى</title>\n</head>\n<body>\n  <!-- اكتب كودك هنا -->\n\n</body>\n</html>',
+  exercises:[
+    {t:"عنوان باسمك", d:"أضف <code>&lt;h1&gt;</code> يحتوي على اسمك.", test:(doc)=>{const h=doc.querySelector('h1');return !!(h&&h.textContent.trim());}},
+    {t:"فقرة تعريفية", d:"أضف <code>&lt;p&gt;</code> تصف نفسك.", test:(doc)=>{const p=doc.querySelector('p');return !!(p&&p.textContent.trim().length>3);}},
+    {t:"رابط", d:"أضف <code>&lt;a href&gt;</code> لموقعك المفضل.", test:(doc)=>{const a=doc.querySelector('a[href]');return !!(a&&a.getAttribute('href').trim().length>1);}},
+    {t:"قائمة", d:"أضف <code>&lt;ul&gt;</code> بها 3 عناصر <code>&lt;li&gt;</code>.", test:(doc)=>doc.querySelectorAll('ul li, ol li').length>=3},
+    {t:"صورة", d:"أضف <code>&lt;img&gt;</code> بخاصيتي src وalt.", test:(doc)=>{const i=doc.querySelector('img[src][alt]');return !!(i&&i.getAttribute('src').trim()&&i.getAttribute('alt').trim());}}
+  ],
+  congrats:"تعرفت على بنية HTML والعناصر الأساسية. المستوى التالي: الجداول والنماذج والهيكلة الدلالية."
+},
+{
+  id:2, name:"HTML متقدم", eyebrow:"الدرس ٢",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٢</span>جداول، نماذج، وهيكلة دلالية</h2>
+    <p>الآن ننتقل للعناصر التي تبني <strong>تطبيقات حقيقية</strong>: الجداول لعرض البيانات، النماذج لاستقبال مدخلات المستخدم، والوسوم الدلالية لهيكلة احترافية يفهمها جوجل وقارئات الشاشة.</p>
+    <div class="example-card">
+      <h4><code>&lt;table&gt;</code> — جدول بيانات</h4>
+      <span class="ex-note"><code>tr</code> صف، <code>th</code> خلية رأس، <code>td</code> خلية بيانات.</span>
+      <pre><code>&lt;table border="1"&gt;
+  &lt;tr&gt;&lt;th&gt;المنتج&lt;/th&gt;&lt;th&gt;السعر&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;كتاب&lt;/td&gt;&lt;td&gt;50&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
     </div>
-
-    <div class="congrats" id="congrats" hidden>
-      <h3>🎉 أحسنت! أنهيت المستوى الأول</h3>
-      <p>تعرفت الآن على بنية HTML والعناصر الأساسية. قل لي "أعطني المستوى الثاني" عندما تكون جاهزًا للمتابعة إلى النماذج والجداول والفيديو.</p>
+    <div class="example-card">
+      <h4><code>&lt;form&gt;</code> — نموذج إدخال</h4>
+      <span class="ex-note">أنواع input المهمة: text, email, password, number, date, checkbox, radio. خاصية <code>required</code> تجعل الحقل إجبارياً.</span>
+      <pre><code>&lt;form&gt;
+  &lt;label&gt;البريد:&lt;/label&gt;
+  &lt;input type="email" required&gt;
+  &lt;select&gt;
+    &lt;option&gt;الرياض&lt;/option&gt;
+    &lt;option&gt;جدة&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;button&gt;إرسال&lt;/button&gt;
+&lt;/form&gt;</code></pre>
     </div>
-  </section>
+    <div class="example-card">
+      <h4>الوسوم الدلالية — Semantic HTML</h4>
+      <span class="ex-note">بدل <code>div</code> لكل شيء، استخدم وسوماً بمعنى: تحسّن SEO وإمكانية الوصول.</span>
+      <pre><code>&lt;header&gt;الترويسة والقائمة&lt;/header&gt;
+&lt;main&gt;
+  &lt;section&gt;قسم من المحتوى&lt;/section&gt;
+  &lt;article&gt;محتوى مستقل&lt;/article&gt;
+&lt;/main&gt;
+&lt;footer&gt;التذييل&lt;/footer&gt;</code></pre>
+    </div>
+    <div class="example-card">
+      <h4><code>&lt;video&gt;</code> و <code>&lt;iframe&gt;</code> — الوسائط</h4>
+      <pre><code>&lt;video src="clip.mp4" controls&gt;&lt;/video&gt;
+&lt;iframe src="https://example.com"&gt;&lt;/iframe&gt;</code></pre>
+    </div>`,
+  starter:'<!DOCTYPE html>\n<html>\n<head>\n  <title>سيرتي الذاتية</title>\n</head>\n<body>\n  <!-- ابنِ صفحة سيرة ذاتية: header ثم جدول مهارات ثم نموذج تواصل ثم footer -->\n\n</body>\n</html>',
+  exercises:[
+    {t:"جدول", d:"أضف <code>&lt;table&gt;</code> بصفّين <code>&lt;tr&gt;</code> على الأقل.", test:(doc)=>doc.querySelectorAll('table tr').length>=2},
+    {t:"نموذج", d:"أضف <code>&lt;form&gt;</code> بداخله <code>&lt;input&gt;</code>.", test:(doc)=>!!doc.querySelector('form input')},
+    {t:"حقل بريد إجباري", d:"أضف <code>&lt;input type=&quot;email&quot; required&gt;</code>.", test:(doc)=>!!doc.querySelector('input[type="email"][required]')},
+    {t:"قائمة منسدلة", d:"أضف <code>&lt;select&gt;</code> بخيارين <code>&lt;option&gt;</code> على الأقل.", test:(doc)=>doc.querySelectorAll('select option').length>=2},
+    {t:"هيكلة دلالية", d:"استخدم <code>&lt;header&gt;</code> و<code>&lt;footer&gt;</code> معاً.", test:(doc)=>!!(doc.querySelector('header')&&doc.querySelector('footer'))}
+  ],
+  congrats:"أتقنت الجداول والنماذج والهيكلة الدلالية. حان وقت الجمال: CSS!"
+},
+{
+  id:3, name:"أساسيات CSS", eyebrow:"الدرس ٣",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٣</span>CSS — لغة التصميم</h2>
+    <p>CSS تحدد <strong>شكل</strong> كل عنصر: لونه، حجمه، مسافاته. القاعدة تتكون من <strong>محدد</strong> (من نصمم؟) و<strong>تصريحات</strong> (ماذا نغير؟).</p>
+    <pre><code>selector {
+  property: value;
+}</code></pre>
+    <div class="example-card">
+      <h4>المحددات الأساسية</h4>
+      <pre><code>p        { color: blue; }      /* كل الفقرات */
+.card    { padding: 20px; }    /* class="card" */
+#main    { width: 80%; }       /* id="main" */
+nav a    { color: red; }       /* الروابط داخل nav */
+a:hover  { color: green; }     /* عند مرور الفأرة */</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>نموذج الصندوق — Box Model</h4>
+      <span class="ex-note">أهم مفهوم في CSS: كل عنصر صندوق من محتوى + حشوة + إطار + هامش.</span>
+      <pre><code>.card {
+  padding: 20px;        /* مسافة داخلية */
+  border: 2px solid #333;
+  margin: 15px;         /* مسافة خارجية */
+  border-radius: 12px;  /* زوايا دائرية */
+}</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>النصوص والألوان والخلفيات</h4>
+      <pre><code>body {
+  background-color: #f5f6fa;
+  font-family: 'Cairo', sans-serif;
+}
+h1 {
+  color: #6c5ce7;
+  text-align: center;
+  font-size: 32px;
+}</code></pre>
+    </div>
+    <p>اكتب CSS داخل وسم <code>&lt;style&gt;</code> في <code>&lt;head&gt;</code>. جرّب في المحرر!</p>`,
+  starter:'<!DOCTYPE html>\n<html>\n<head>\n  <title>تصميمي الأول</title>\n  <style>\n    /* اكتب CSS هنا */\n\n  </style>\n</head>\n<body>\n  <h1>عنوان الصفحة</h1>\n  <div class="card">\n    <p>هذه بطاقة تحتاج تصميمك.</p>\n  </div>\n</body>\n</html>',
+  exercises:[
+    {t:"لوّن العنوان", d:"أعطِ <code>h1</code> خاصية <code>color</code>.", test:(d,c,css)=>/h1\s*{[^}]*color\s*:/s.test(css)},
+    {t:"خلفية الصفحة", d:"أعطِ <code>body</code> خاصية <code>background</code>.", test:(d,c,css)=>/body\s*{[^}]*background/s.test(css)},
+    {t:"صمم البطاقة", d:"أعطِ <code>.card</code> خاصيتي <code>padding</code> و<code>border-radius</code>.", test:(d,c,css)=>/\.card\s*{[^}]*padding\s*:/s.test(css)&&/\.card\s*{[^}]*border-radius\s*:/s.test(css)},
+    {t:"وسّط النص", d:"استخدم <code>text-align: center</code> في أي محدد.", test:(d,c,css)=>/text-align\s*:\s*center/.test(css)},
+    {t:"غيّر الخط", d:"استخدم <code>font-family</code> في أي محدد.", test:(d,c,css)=>/font-family\s*:/.test(css)}
+  ],
+  congrats:"أساسيات CSS في جيبك. التالي: Flexbox وGrid والحركة — أدوات المصمم المحترف."
+},
+{
+  id:4, name:"CSS متقدم", eyebrow:"الدرس ٤",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٤</span>Flexbox وGrid والحركة</h2>
+    <p>هنا تنتقل من "تلوين" إلى <strong>هندسة تخطيطات</strong> حقيقية.</p>
+    <div class="example-card">
+      <h4>Flexbox — ترتيب في اتجاه واحد</h4>
+      <pre><code>.container {
+  display: flex;
+  justify-content: space-between; /* توزيع أفقي */
+  align-items: center;            /* محاذاة عمودية */
+  gap: 15px;
+}</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>Grid — شبكة ثنائية الأبعاد</h4>
+      <pre><code>.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 أعمدة */
+  gap: 20px;
+}</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>الحركة — transition و transform</h4>
+      <pre><code>.btn {
+  transition: all 0.3s;
+}
+.btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>Position — التموضع</h4>
+      <pre><code>.navbar { position: sticky; top: 0; }  /* يلتصق أعلى الشاشة */
+.badge  { position: absolute; }        /* بالنسبة لأب relative */</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>متغيرات CSS</h4>
+      <pre><code>:root { --main: #e63946; }
+h1 { color: var(--main); }</code></pre>
+    </div>`,
+  starter:'<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    .container {\n      /* اجعلها flex */\n    }\n    .box {\n      background: #6c5ce7; color: white;\n      padding: 25px; border-radius: 10px;\n    }\n  </style>\n</head>\n<body>\n  <div class="container">\n    <div class="box">1</div>\n    <div class="box">2</div>\n    <div class="box">3</div>\n  </div>\n</body>\n</html>',
+  exercises:[
+    {t:"فعّل Flexbox", d:"أعطِ <code>.container</code> خاصية <code>display: flex</code>.", test:(d,c,css)=>/display\s*:\s*flex/.test(css)},
+    {t:"وزّع العناصر", d:"استخدم <code>justify-content</code>.", test:(d,c,css)=>/justify-content\s*:/.test(css)},
+    {t:"أنشئ شبكة", d:"أضف محدداً يستخدم <code>grid-template-columns</code>.", test:(d,c,css)=>/grid-template-columns\s*:/.test(css)},
+    {t:"تأثير hover", d:"أضف قاعدة <code>:hover</code> لأي عنصر.", test:(d,c,css)=>/:hover\s*{/.test(css)},
+    {t:"حركة ناعمة", d:"استخدم <code>transition</code>.", test:(d,c,css)=>/transition\s*:/.test(css)}
+  ],
+  congrats:"صرت تبني تخطيطات احترافية. الآن نضيف العقل: JavaScript!"
+},
+{
+  id:5, name:"أساسيات JS", eyebrow:"الدرس ٥",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٥</span>JavaScript — لغة المنطق</h2>
+    <p>HTML الهيكل، CSS الشكل، وJavaScript <strong>العقل</strong>: تخزن بيانات، تتخذ قرارات، وتكرر عمليات. يُكتب داخل <code>&lt;script&gt;</code>.</p>
+    <div class="example-card">
+      <h4>المتغيرات وأنواع البيانات</h4>
+      <pre><code>const name = "أحمد";   // ثابت لا يتغير
+let age = 25;          // متغير
+let isStudent = true;  // منطقي
+const hobbies = ["قراءة", "برمجة", "سفر"]; // مصفوفة</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>الشروط — اتخاذ القرار</h4>
+      <pre><code>if (age >= 18) {
+  console.log("بالغ");
+} else {
+  console.log("قاصر");
+}</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>الحلقات — التكرار</h4>
+      <pre><code>for (let i = 1; i <= 5; i++) {
+  console.log("الدورة رقم " + i);
+}
+hobbies.forEach(h => console.log(h));</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>الدوال — كتل قابلة لإعادة الاستخدام</h4>
+      <pre><code>function greet(name) {
+  return "أهلاً يا " + name;
+}
+const double = (n) => n * 2;  // دالة سهمية</code></pre>
+    </div>
+    <p>💡 افتح أدوات المطور (F12) وشاهد نتائج <code>console.log</code>، أو استخدم <code>document.write</code> لعرضها في المعاينة.</p>`,
+  starter:'<!DOCTYPE html>\n<html>\n<body>\n  <h1>مختبر جافاسكريبت</h1>\n  <div id="output"></div>\n  <script>\n    const output = document.getElementById("output");\n    // اكتب كودك هنا واعرض النتائج هكذا:\n    // output.innerHTML += "مرحباً<br>";\n\n  <\/script>\n</body>\n</html>',
+  exercises:[
+    {t:"متغير", d:"عرّف متغيراً بـ <code>const</code> أو <code>let</code>.", test:(d,c,css,js)=>/\b(const|let)\s+\w+\s*=/.test(js)},
+    {t:"مصفوفة", d:"أنشئ مصفوفة بها 3 عناصر على الأقل.", test:(d,c,css,js)=>/\[[^\]]*,[^\]]*,[^\]]+\]/.test(js)},
+    {t:"شرط", d:"اكتب جملة <code>if</code>.", test:(d,c,css,js)=>/\bif\s*\(/.test(js)},
+    {t:"حلقة", d:"استخدم <code>for</code> أو <code>while</code> أو <code>forEach</code>.", test:(d,c,css,js)=>/\b(for|while)\s*\(|\.forEach\s*\(/.test(js)},
+    {t:"دالة", d:"عرّف دالة بـ <code>function</code> أو دالة سهمية <code>=&gt;</code>.", test:(d,c,css,js)=>/\bfunction\s+\w+|=>\s*[{\w(]/.test(js)}
+  ],
+  congrats:"أتقنت منطق البرمجة. التالي: التحكم في عناصر الصفحة نفسها — الـ DOM."
+},
+{
+  id:6, name:"JS والـ DOM", eyebrow:"الدرس ٦",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٦</span>الـ DOM — التحكم في الصفحة</h2>
+    <p>الـ DOM هو تمثيل الصفحة كشجرة كائنات يمكن لـ JS <strong>قراءتها وتعديلها</strong>: تغيير نصوص، إنشاء عناصر، حذفها.</p>
+    <div class="example-card">
+      <h4>اختيار العناصر</h4>
+      <pre><code>const title = document.querySelector("h1");
+const btn = document.getElementById("btn");
+const cards = document.querySelectorAll(".card"); // كلها</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>تعديل المحتوى والتصميم</h4>
+      <pre><code>title.textContent = "نص جديد";
+title.style.color = "red";
+title.classList.add("highlight");   // إضافة كلاس
+title.classList.toggle("dark");     // تبديل</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>إنشاء عناصر جديدة</h4>
+      <pre><code>const li = document.createElement("li");
+li.textContent = "عنصر جديد";
+document.querySelector("ul").appendChild(li);</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>الفرق المهم</h4>
+      <span class="ex-note"><code>textContent</code> نص خام آمن — <code>innerHTML</code> يفسّر الوسوم (انتبه لثغرات XSS مع مدخلات المستخدم).</span>
+    </div>`,
+  starter:'<!DOCTYPE html>\n<html>\n<body>\n  <h1 id="title">قائمة مهامي</h1>\n  <ul id="list">\n    <li>مهمة قديمة</li>\n  </ul>\n  <script>\n    // 1) اختر العنوان وغيّر نصه\n    // 2) أنشئ li جديداً وأضفه للقائمة\n\n  <\/script>\n</body>\n</html>',
+  exercises:[
+    {t:"اختر عنصراً", d:"استخدم <code>querySelector</code> أو <code>getElementById</code>.", test:(d,c,css,js)=>/querySelector|getElementById/.test(js)},
+    {t:"غيّر النص", d:"استخدم <code>textContent</code> أو <code>innerHTML</code>.", test:(d,c,css,js)=>/\.(textContent|innerHTML)\s*[+]?=/.test(js)},
+    {t:"أنشئ عنصراً", d:"استخدم <code>createElement</code>.", test:(d,c,css,js)=>/createElement\s*\(/.test(js)},
+    {t:"أضفه للصفحة", d:"استخدم <code>appendChild</code> أو <code>append</code>.", test:(d,c,css,js)=>/\.(appendChild|append)\s*\(/.test(js)},
+    {t:"تحكم في الكلاسات", d:"استخدم <code>classList</code> أو <code>style.</code>", test:(d,c,css,js)=>/classList\.|\.style\./.test(js)}
+  ],
+  congrats:"تتحكم الآن في الصفحة برمجياً. بقي أن تجعلها تستجيب للمستخدم: الأحداث!"
+},
+{
+  id:7, name:"أحداث JS", eyebrow:"الدرس ٧",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٧</span>الأحداث — التفاعل مع المستخدم</h2>
+    <p>الأحداث تجعل الصفحة <strong>حيّة</strong>: نقرة، كتابة، إرسال نموذج — وأنت تقرر ماذا يحدث.</p>
+    <div class="example-card">
+      <h4>addEventListener — الأساس</h4>
+      <pre><code>const btn = document.querySelector("#btn");
+btn.addEventListener("click", () => {
+  alert("تم الضغط!");
+});</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>أهم الأحداث</h4>
+      <pre><code>input.addEventListener("input", e => {
+  console.log(e.target.value);  // مع كل حرف
+});
+form.addEventListener("submit", e => {
+  e.preventDefault();  // منع إعادة تحميل الصفحة
+});
+document.addEventListener("keydown", e => {
+  console.log(e.key);  // أي زر ضُغط
+});</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>مثال حقيقي: عدّاد</h4>
+      <pre><code>let count = 0;
+btn.addEventListener("click", () => {
+  count++;
+  result.textContent = "النقرات: " + count;
+});</code></pre>
+    </div>`,
+  starter:'<!DOCTYPE html>\n<html>\n<body>\n  <button id="btn">اضغطني</button>\n  <p id="result">النقرات: 0</p>\n  <input id="nameInput" placeholder="اكتب اسمك">\n  <p id="greeting"></p>\n  <script>\n    let count = 0;\n    // 1) عند الضغط على الزر زد العداد واعرضه\n    // 2) عند الكتابة في الحقل اعرض تحية بالاسم\n\n  <\/script>\n</body>\n</html>',
+  exercises:[
+    {t:"مستمع نقر", d:"استخدم <code>addEventListener(&quot;click&quot;)</code>.", test:(d,c,css,js)=>/addEventListener\s*\(\s*["']click["']/.test(js)},
+    {t:"عدّاد يعمل", d:"زد متغيراً بـ <code>++</code> أو <code>+=</code> داخل الحدث.", test:(d,c,css,js)=>/\+\+|\+=\s*1/.test(js)},
+    {t:"اعرض النتيجة", d:"حدّث <code>textContent</code> داخل معالج الحدث.", test:(d,c,css,js)=>/textContent\s*=/.test(js)},
+    {t:"حدث كتابة", d:"استخدم حدث <code>input</code> أو <code>keydown</code>.", test:(d,c,css,js)=>/addEventListener\s*\(\s*["'](input|keydown|keyup)["']/.test(js)},
+    {t:"اقرأ قيمة الحقل", d:"استخدم <code>.value</code>.", test:(d,c,css,js)=>/\.value\b/.test(js)}
+  ],
+  congrats:"صفحاتك الآن تفاعلية بالكامل. بقيت مهارة المحترفين: التجاوب مع كل الشاشات."
+},
+{
+  id:8, name:"التصميم المتجاوب", eyebrow:"الدرس ٨",
+  lesson:`
+    <h2><span class="eyebrow">الدرس ٨</span>Responsive — موقع لكل الشاشات</h2>
+    <p>أكثر من نصف الزوار من الجوال. الموقع المحترف <strong>يتكيف</strong> مع أي حجم شاشة.</p>
+    <div class="example-card">
+      <h4>meta viewport — السطر الإجباري</h4>
+      <pre><code>&lt;meta name="viewport"
+      content="width=device-width, initial-scale=1.0"&gt;</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>Media Queries — قواعد حسب حجم الشاشة</h4>
+      <pre><code>/* الأساس للجوال أولاً (Mobile First) */
+.grid { grid-template-columns: 1fr; }
 
-</div>
+/* ثم الشاشات الأكبر */
+@media (min-width: 768px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>الوحدات المرنة</h4>
+      <pre><code>width: 90%;          /* نسبة من الأب */
+font-size: 1.2rem;   /* نسبة لخط الجذر */
+height: 100vh;       /* ارتفاع الشاشة كاملاً */
+max-width: 1100px;   /* حد أقصى */</code></pre>
+    </div>
+    <div class="example-card">
+      <h4>شبكة تتكيف تلقائياً</h4>
+      <pre><code>.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.row { display: flex; flex-wrap: wrap; }</code></pre>
+    </div>`,
+  starter:'<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <!-- أضف meta viewport هنا -->\n  <style>\n    .grid {\n      display: grid;\n      gap: 10px;\n      /* اجعلها عموداً واحداً ثم 3 أعمدة فوق 768px */\n    }\n    .item { background: #00b894; color: #fff; padding: 30px; border-radius: 10px; }\n  </style>\n</head>\n<body>\n  <div class="grid">\n    <div class="item">1</div><div class="item">2</div><div class="item">3</div>\n  </div>\n</body>\n</html>',
+  exercises:[
+    {t:"viewport", d:"أضف وسم <code>meta viewport</code>.", test:(d)=>!!d.querySelector('meta[name="viewport"]')},
+    {t:"media query", d:"أضف قاعدة <code>@media</code>.", test:(d,c,css)=>/@media/.test(css)},
+    {t:"وحدة مرنة", d:"استخدم <code>%</code> أو <code>rem</code> أو <code>vh</code>.", test:(d,c,css)=>/\d(%|rem|vh|vw)/.test(css)},
+    {t:"حد أقصى", d:"استخدم <code>max-width</code> في CSS أو الاستعلام.", test:(d,c,css)=>/max-width/.test(css)},
+    {t:"أعمدة متغيرة", d:"غيّر <code>grid-template-columns</code> داخل <code>@media</code>.", test:(d,c,css)=>/@media[^{]*{[\s\S]*grid-template-columns/.test(css)}
+  ],
+  congrats:"اكتملت أدواتك كلها. أمامك الآن التحدي الأخير: مشروع التخرج!"
+},
+{
+  id:9, name:"مشروع التخرج", eyebrow:"المشروع النهائي",
+  lesson:`
+    <h2><span class="eyebrow">المشروع النهائي</span>ابنِ موقعك الشخصي الكامل</h2>
+    <p>هنا تجمع <strong>كل ما تعلمته</strong> في موقع واحد حقيقي: هيكلة دلالية، تصميم متجاوب، وتفاعل JavaScript. هذا المشروع يصلح ليكون أول عمل في معرض أعمالك.</p>
+    <h3>المواصفات المطلوبة</h3>
+    <div class="example-card">
+      <h4>1. الهيكل (HTML)</h4>
+      <span class="ex-note">header يحتوي اسمك وقائمة تنقل nav بثلاثة روابط، ثم main بأقسام: نبذة عني، مهاراتي، تواصل معي، ثم footer.</span>
+    </div>
+    <div class="example-card">
+      <h4>2. التصميم (CSS)</h4>
+      <span class="ex-note">استخدم Flexbox أو Grid للتخطيط، ألواناً متناسقة بمتغيرات CSS، تأثير hover للروابط، و@media للجوال.</span>
+    </div>
+    <div class="example-card">
+      <h4>3. التفاعل (JS)</h4>
+      <span class="ex-note">نموذج تواصل يتحقق من الاسم قبل الإرسال (preventDefault + رسالة ترحيب)، أو زر يبدّل الوضع الليلي بـ classList.toggle.</span>
+    </div>
+    <h3>خطوات العمل المقترحة</h3>
+    <p>1) ابنِ الهيكل كاملاً بلا تصميم. 2) أضف CSS قسماً قسماً. 3) اختبر التجاوب بتصغير نافذة المعاينة. 4) أضف JS في النهاية. هكذا يعمل المحترفون.</p>`,
+  starter:'<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>موقعي الشخصي</title>\n  <style>\n    /* صمم موقعك هنا */\n  </style>\n</head>\n<body>\n  <!-- ابنِ موقعك الكامل هنا -->\n\n  <script>\n    // التفاعل هنا\n  <\/script>\n</body>\n</html>',
+  exercises:[
+    {t:"هيكل دلالي كامل", d:"استخدم <code>header</code> و<code>main</code> و<code>footer</code>.", test:(d)=>!!(d.querySelector('header')&&d.querySelector('main')&&d.querySelector('footer'))},
+    {t:"قائمة تنقل", d:"أضف <code>nav</code> بها 3 روابط <code>a</code> على الأقل.", test:(d)=>d.querySelectorAll('nav a').length>=3},
+    {t:"تخطيط حديث ومتجاوب", d:"استخدم <code>flex</code> أو <code>grid</code> مع <code>@media</code>.", test:(d,c,css)=>/display\s*:\s*(flex|grid)/.test(css)&&/@media/.test(css)},
+    {t:"نموذج تواصل", d:"أضف <code>form</code> بحقل <code>required</code> وزر.", test:(d)=>!!(d.querySelector('form [required]')&&d.querySelector('form button, form input[type="submit"]'))},
+    {t:"تفاعل JS", d:"استخدم <code>addEventListener</code> في السكربت.", test:(d,c,css,js)=>/addEventListener\s*\(/.test(js)}
+  ],
+  congrats:"🏆 مبارك! أكملت المنهج كاملاً وبنيت موقعاً حقيقياً بيديك. الخطوة التالية: ارفعه على GitLab Pages وشاركه مع العالم، ثم انطلق نحو React أو Vue."
+}
+];
 
-<script>
-  const codeInput = document.getElementById('codeInput');
-  const preview = document.getElementById('preview');
-  const resetBtn = document.getElementById('resetBtn');
-  const checkBtn = document.getElementById('checkBtn');
-  const checkStatus = document.getElementById('checkStatus');
-  const congrats = document.getElementById('congrats');
-  const progressCount = document.getElementById('progressCount');
-  const ring = document.getElementById('ring');
-  const RING_LEN = 188.4;
+/* ================================================================
+   محرك المنصة — التنقل، الحفظ، التحقق، التقدم
+   ================================================================ */
+const $ = s => document.querySelector(s);
+const codeInput=$('#codeInput'), preview=$('#preview'), ring=$('#ring');
+const RING_LEN=188.4, STORE_KEY='warsha-web-v2';
 
-  const starter = codeInput.value;
+let state = loadState();
+let current = state.current || 1;
 
-  function renderPreview(){
-    preview.srcdoc = codeInput.value;
-  }
-  let t;
-  codeInput.addEventListener('input', () => {
-    clearTimeout(t);
-    t = setTimeout(renderPreview, 250);
-  });
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {current:1, unlocked:1, levels:{}}; }
+  catch(e){ return {current:1, unlocked:1, levels:{}}; }
+}
+function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function levelData(id){ return LEVELS.find(l=>l.id===id); }
+function levelState(id){
+  if(!state.levels[id]) state.levels[id]={code:null, done:[], completed:false};
+  return state.levels[id];
+}
+
+/* --- خارطة الطريق --- */
+function renderRoadmap(){
+  $('#roadmap').innerHTML = LEVELS.map(l=>{
+    const ls = state.levels[l.id]||{};
+    const cls = [ l.id===current?'active':'', l.id>state.unlocked?'locked':'', ls.completed?'done-level':'' ].join(' ');
+    const num = ls.completed ? '✓' : String(l.id).padStart(2,'0');
+    return '<li class="'+cls+'" data-level="'+l.id+'"><span class="num">'+num+'</span>'+l.name+'</li>';
+  }).join('');
+}
+$('#roadmap').addEventListener('click', e=>{
+  const li = e.target.closest('li[data-level]');
+  if(!li) return;
+  const id = Number(li.dataset.level);
+  if(id > state.unlocked) return;
+  switchLevel(id);
+});
+
+/* --- عرض مستوى --- */
+function switchLevel(id){
+  // احفظ كود المستوى الحالي قبل المغادرة
+  levelState(current).code = codeInput.value;
+  current = id; state.current = id; saveState();
+
+  const lv = levelData(id), ls = levelState(id);
+  $('#lessonBox').innerHTML = lv.lesson;
+  $('#exTitle').textContent = 'تحديات: ' + lv.name;
+  $('#editorLevelName').textContent = lv.name;
+  $('#progressTotal').textContent = lv.exercises.length;
+  codeInput.value = ls.code!=null ? ls.code : lv.starter;
+
+  $('#exerciseGrid').innerHTML = lv.exercises.map((ex,i)=>{
+    const done = ls.done.includes(i);
+    return '<div class="exercise'+(done?' done':'')+'" data-ex="'+i+'">'
+      +'<div class="status">'+(done?'✓':(i+1))+'</div>'
+      +'<div class="body"><strong>'+ex.t+'</strong><span>'+ex.d+'</span></div></div>';
+  }).join('');
+
+  $('#checkStatus').textContent='';
+  $('#congrats').hidden = !ls.completed;
+  $('#congratsText').textContent = lv.congrats;
+  $('#nextBtn').style.display = (id===LEVELS.length)?'none':'';
+  updateRing(ls.done.length, lv.exercises.length);
+  renderRoadmap();
   renderPreview();
+  $('.content-pane').scrollTo({top:0, behavior:'smooth'});
+}
 
-  resetBtn.addEventListener('click', () => {
-    codeInput.value = starter;
-    renderPreview();
+/* --- المعاينة الحية --- */
+function renderPreview(){ preview.srcdoc = codeInput.value; }
+let t;
+codeInput.addEventListener('input', ()=>{
+  clearTimeout(t);
+  t = setTimeout(()=>{ renderPreview(); levelState(current).code = codeInput.value; saveState(); }, 300);
+});
+
+$('#resetBtn').addEventListener('click', ()=>{
+  codeInput.value = levelData(current).starter;
+  levelState(current).code = null; saveState();
+  renderPreview();
+});
+
+/* --- التحقق --- */
+function extract(code){
+  const doc = new DOMParser().parseFromString(code,'text/html');
+  const css = Array.from(doc.querySelectorAll('style')).map(s=>s.textContent).join('\n');
+  const js  = Array.from(doc.querySelectorAll('script')).map(s=>s.textContent).join('\n');
+  return {doc, css, js};
+}
+function updateRing(done,total){
+  $('#progressCount').textContent = done;
+  ring.style.strokeDashoffset = RING_LEN - (RING_LEN*(done/total));
+}
+$('#checkBtn').addEventListener('click', ()=>{
+  const lv = levelData(current), ls = levelState(current);
+  const {doc, css, js} = extract(codeInput.value);
+  ls.done = [];
+  lv.exercises.forEach((ex,i)=>{
+    let ok=false;
+    try{ ok = !!ex.test(doc, codeInput.value, css, js); }catch(e){ ok=false; }
+    const card = document.querySelector('.exercise[data-ex="'+i+'"]');
+    card.classList.toggle('done', ok);
+    card.querySelector('.status').textContent = ok?'✓':(i+1);
+    if(ok) ls.done.push(i);
   });
-
-  function parseCode(){
-    const parser = new DOMParser();
-    return parser.parseFromString(codeInput.value, 'text/html');
+  const done = ls.done.length, total = lv.exercises.length;
+  updateRing(done,total);
+  if(done===total){
+    ls.completed = true;
+    state.unlocked = Math.max(state.unlocked, Math.min(current+1, LEVELS.length));
+    $('#checkStatus').textContent='رائع! أكملت كل التحديات.';
+    $('#congrats').hidden = false;
+  } else {
+    $('#checkStatus').textContent='أنجزت '+done+' من '+total+' — كمّل الباقي وحاول مجددًا.';
+    $('#congrats').hidden = true;
   }
+  saveState(); renderRoadmap();
+});
 
-  function checkAll(){
-    const doc = parseCode();
-    const results = {};
+$('#nextBtn').addEventListener('click', ()=>{
+  if(current < LEVELS.length) switchLevel(current+1);
+});
 
-    const h1 = doc.querySelector('h1');
-    results[1] = !!(h1 && h1.textContent.trim().length > 0);
-
-    const p = doc.querySelector('p');
-    results[2] = !!(p && p.textContent.trim().length > 3);
-
-    const a = doc.querySelector('a[href]');
-    results[3] = !!(a && a.getAttribute('href') && a.getAttribute('href').trim().length > 1);
-
-    const items = doc.querySelectorAll('ul li, ol li');
-    results[4] = items.length >= 3;
-
-    const img = doc.querySelector('img[src][alt]');
-    results[5] = !!(img && img.getAttribute('src').trim().length > 0 && img.getAttribute('alt').trim().length > 0);
-
-    let doneCount = 0;
-    Object.keys(results).forEach(key => {
-      const card = document.querySelector('.exercise[data-ex="' + key + '"]');
-      if(results[key]){
-        card.classList.add('done');
-        card.querySelector('.status').textContent = '✓';
-        doneCount++;
-      } else {
-        card.classList.remove('done');
-        card.querySelector('.status').textContent = key;
-      }
-    });
-
-    progressCount.textContent = doneCount;
-    const offset = RING_LEN - (RING_LEN * (doneCount/5));
-    ring.style.strokeDashoffset = offset;
-
-    if(doneCount === 5){
-      checkStatus.textContent = 'رائع! أكملت كل التحديات.';
-      congrats.hidden = false;
-    } else {
-      checkStatus.textContent = 'أنجزت ' + doneCount + ' من 5 — كمّل الباقي وحاول مجددًا.';
-      congrats.hidden = true;
-    }
-  }
-
-  checkBtn.addEventListener('click', checkAll);
+/* --- إقلاع --- */
+switchLevel(current);
 </script>
 </body>
 </html>
