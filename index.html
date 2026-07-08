@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورشة الويب — المستوى ١: أساسيات HTML</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0B1E2D;
+    --bg-panel:#122A40;
+    --bg-panel-2:#173453;
+    --grid-line: rgba(237,232,219,0.06);
+    --line: rgba(237,232,219,0.16);
+    --amber:#F2A93B;
+    --amber-dim:#C98A2C;
+    --paper:#EDE8DB;
+    --dim:#93ABBD;
+    --success:#7FD79B;
+    --error:#E8747C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-deep);
+    color:var(--paper);
+    font-family:'Cairo',sans-serif;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+  .blueprint-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid-line) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 40px);
+  }
+  .wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:28px 24px 80px;}
+
+  /* HEADER */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:20px; padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand-mark{
+    width:52px; height:52px; border-radius:10px;
+    background:linear-gradient(160deg,var(--bg-panel-2),var(--bg-panel));
+    border:1px solid var(--amber-dim);
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; color:var(--amber);
+    box-shadow: inset 0 0 0 1px rgba(242,169,59,0.15);
+  }
+  .brand h1{margin:0; font-size:1.5rem; font-weight:800; letter-spacing:.3px;}
+  .brand .tagline{margin:2px 0 0; font-size:.85rem; color:var(--dim); font-weight:600;}
+
+  .compass{display:flex; align-items:center; gap:12px;}
+  .compass svg{transform:rotate(-90deg);}
+  .compass-ring-bg{fill:none; stroke:rgba(237,232,219,0.1); stroke-width:8;}
+  .compass-ring-fg{fill:none; stroke:var(--amber); stroke-width:8; stroke-linecap:round;
+    transition:stroke-dashoffset .5s ease;}
+  .compass-box{position:relative; width:74px; height:74px;}
+  .compass-label{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; font-family:'JetBrains Mono',monospace; font-size:.95rem; font-weight:700;
+  }
+  .compass-label small{font-size:.6rem; color:var(--dim); font-weight:500;}
+  .compass-text{font-size:.8rem; color:var(--dim); font-weight:600; max-width:120px;}
+
+  /* ROADMAP */
+  nav.roadmap ol{
+    list-style:none; margin:0 0 28px; padding:0; display:flex; gap:10px; flex-wrap:wrap;
+  }
+  nav.roadmap li{
+    flex:1 1 140px; display:flex; align-items:center; gap:8px;
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:9px;
+    padding:10px 12px; font-size:.8rem; font-weight:700; color:var(--dim);
+  }
+  nav.roadmap li .num{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--dim);
+    background:rgba(237,232,219,0.06); padding:2px 6px; border-radius:5px;
+  }
+  nav.roadmap li.active{
+    border-color:var(--amber); color:var(--paper); background:rgba(242,169,59,0.08);
+  }
+  nav.roadmap li.active .num{background:var(--amber); color:var(--bg-deep);}
+  nav.roadmap li.locked{opacity:.5;}
+
+  h2{font-size:1.25rem; font-weight:800; margin:0 0 12px; color:var(--paper);}
+  h2 .eyebrow{display:block; font-size:.7rem; letter-spacing:2px; color:var(--amber); font-weight:700; margin-bottom:6px;}
+  h3{font-size:1rem; font-weight:700; margin:20px 0 10px; color:var(--paper);}
+  p{line-height:1.9; color:var(--dim); font-size:.95rem;}
+  code{
+    font-family:'JetBrains Mono',monospace; direction:ltr; display:inline-block;
+    background:rgba(242,169,59,0.1); color:var(--amber); padding:1px 6px; border-radius:5px; font-size:.85em;
+  }
+  pre{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; overflow-x:auto; direction:ltr; text-align:left;
+  }
+  pre code{background:none; padding:0; color:var(--paper); font-size:.85rem; line-height:1.7;}
+
+  /* LAYOUT */
+  main.layout{
+    display:grid; grid-template-columns:1fr 1.15fr; gap:22px; align-items:start; margin-bottom:32px;
+  }
+  @media (max-width:880px){ main.layout{grid-template-columns:1fr;} }
+
+  .lesson{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:24px;
+  }
+  .tag-list{list-style:none; margin:0; padding:0; display:grid; gap:8px;}
+  .tag-list li{
+    display:flex; align-items:center; gap:10px; font-size:.85rem; color:var(--paper);
+    background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:8px; padding:8px 10px;
+  }
+
+  .example-card{
+    background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px 16px; margin-bottom:14px;
+  }
+  .example-card h4{
+    margin:0 0 4px; font-size:.92rem; font-weight:800; color:var(--paper); display:flex; gap:6px; align-items:center;
+  }
+  .example-card h4 code{font-size:.9em;}
+  .example-card .ex-note{display:block; font-size:.78rem; color:var(--dim); margin-bottom:10px; line-height:1.6;}
+  .example-card pre{margin:0 0 10px; padding:10px 12px; font-size:.78rem;}
+  .example-card .ex-label{
+    font-size:.68rem; font-weight:800; letter-spacing:1px; color:var(--amber);
+    margin-bottom:6px; text-transform:uppercase;
+  }
+  .example-preview-frame{
+    width:100%; min-height:64px; border:1px dashed var(--line); border-radius:8px;
+    background:#fff; display:block;
+  }
+
+  .playground{display:grid; gap:14px;}
+  .panel{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+  }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px; background:var(--bg-panel-2); font-size:.78rem; font-weight:700; color:var(--dim);
+    border-bottom:1px solid var(--line);
+  }
+  .panel-head button{
+    background:none; border:1px solid var(--line); color:var(--dim); border-radius:6px;
+    padding:4px 10px; font-family:'Cairo',sans-serif; font-size:.72rem; font-weight:700; cursor:pointer;
+  }
+  .panel-head button:hover{border-color:var(--amber); color:var(--amber);}
+
+  #codeInput{
+    width:100%; min-height:220px; resize:vertical; border:0; outline:0;
+    background:#0E2233; color:var(--paper); font-family:'JetBrains Mono',monospace;
+    font-size:.82rem; line-height:1.7; padding:16px; direction:ltr; text-align:left;
+  }
+  .preview-panel .panel-head::before{content:"● ● ●"; letter-spacing:3px; color:var(--dim); font-size:.6rem;}
+  #preview{width:100%; height:236px; border:0; background:#fff; display:block;}
+
+  /* EXERCISES */
+  section.exercises{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:24px;
+  }
+  .exercise-grid{display:grid; gap:10px; margin:16px 0 18px;}
+  .exercise{
+    display:flex; align-items:flex-start; gap:12px; padding:12px 14px;
+    background:rgba(237,232,219,0.03); border:1px solid var(--line); border-radius:10px;
+    transition:border-color .3s, background .3s;
+  }
+  .exercise.done{border-color:var(--success); background:rgba(127,215,155,0.08);}
+  .exercise .status{
+    width:26px; height:26px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    background:rgba(237,232,219,0.08); font-size:.8rem; font-weight:800; color:var(--dim);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .exercise.done .status{background:var(--success); color:var(--bg-deep);}
+  .exercise .body strong{display:block; font-size:.9rem; color:var(--paper); margin-bottom:2px;}
+  .exercise .body span{font-size:.8rem; color:var(--dim);}
+  .exercise .body code{margin:0 2px;}
+
+  .actions{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  #checkBtn{
+    background:var(--amber); color:var(--bg-deep); border:0; border-radius:9px;
+    padding:12px 22px; font-family:'Cairo',sans-serif; font-weight:800; font-size:.9rem; cursor:pointer;
+  }
+  #checkBtn:hover{background:#ffbf5a;}
+  #checkStatus{font-size:.82rem; color:var(--dim); font-weight:600;}
+
+  .congrats{
+    margin-top:18px; padding:18px 20px; border-radius:12px;
+    background:linear-gradient(120deg, rgba(242,169,59,0.14), rgba(127,215,155,0.1));
+    border:1px solid var(--amber);
+  }
+  .congrats h3{margin:0 0 6px; color:var(--amber);}
+  .congrats p{color:var(--paper); margin:0;}
+</style>
+</head>
+<body>
+<div class="blueprint-grid"></div>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">⌁</div>
+      <div>
+        <h1>ورشة الويب</h1>
+        <p class="tagline">من الصفر إلى الاحتراف — HTML · CSS · JavaScript</p>
+      </div>
+    </div>
+    <div class="compass">
+      <div class="compass-box">
+        <svg width="74" height="74" viewBox="0 0 74 74">
+          <circle class="compass-ring-bg" cx="37" cy="37" r="30"></circle>
+          <circle id="ring" class="compass-ring-fg" cx="37" cy="37" r="30"
+            stroke-dasharray="188.4" stroke-dashoffset="188.4"></circle>
+        </svg>
+        <div class="compass-label"><span id="progressCount">0</span><small>من 5</small></div>
+      </div>
+      <div class="compass-text">تقدّمك في تحديات المستوى الأول</div>
+    </div>
+  </header>
+
+  <nav class="roadmap">
+    <ol>
+      <li class="active"><span class="num">01</span>أساسيات HTML</li>
+      <li class="locked"><span class="num">02</span>HTML متقدم</li>
+      <li class="locked"><span class="num">03</span>أساسيات CSS</li>
+      <li class="locked"><span class="num">04</span>CSS متقدم</li>
+      <li class="locked"><span class="num">05</span>جافاسكريبت</li>
+      <li class="locked"><span class="num">06</span>مشروع التخرج</li>
+    </ol>
+  </nav>
+
+  <main class="layout">
+    <section class="lesson">
+      <h2><span class="eyebrow">الدرس ١.١</span>ما هي HTML؟</h2>
+      <p>HTML (لغة ترميز النص التشعبي) ليست لغة برمجة، بل لغة <strong style="color:var(--paper)">هيكلة</strong>. مهمتها الوحيدة هي إخبار المتصفح: "هذا عنوان، هذه فقرة، هذه صورة". كل شيء تراه في أي موقع ويب مبني فوق هيكل HTML، تمامًا كما يُبنى البيت فوق مخطط هندسي.</p>
+
+      <h3>البنية الأساسية لأي صفحة</h3>
+      <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;عنوان الصفحة&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- المحتوى الذي يظهر للزائر --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <h3>عناصر اليوم — مع مثال كامل لكل عنصر</h3>
+      <p style="margin-top:-4px;">كل بطاقة تحتها تحتوي الكود على اليمين والناتج الفعلي كما يظهر في المتصفح تحته مباشرة.</p>
+
+      <div class="example-card">
+        <h4><code>&lt;h1&gt;</code> — عنوان رئيسي</h4>
+        <span class="ex-note">يُستخدم مرة واحدة فقط في الصفحة، وهو أهم عنوان فيها.</span>
+        <pre><code>&lt;h1&gt;مرحبًا، أنا محمد&lt;/h1&gt;</code></pre>
+        <div class="ex-label">الناتج</div>
+        <iframe class="example-preview-frame" title="مثال h1" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;h1 style='margin:0;font-size:22px;'&gt;مرحبًا، أنا محمد&lt;/h1&gt;&lt;/body&gt;"></iframe>
+      </div>
+
+      <div class="example-card">
+        <h4><code>&lt;p&gt;</code> — فقرة نصية</h4>
+        <span class="ex-note">لأي كتلة نص عادية: جملة، وصف، تعريف.</span>
+        <pre><code>&lt;p&gt;أنا مطوّر ويب مبتدئ أتعلم HTML وCSS وJavaScript.&lt;/p&gt;</code></pre>
+        <div class="ex-label">الناتج</div>
+        <iframe class="example-preview-frame" title="مثال p" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;p style='margin:0;'&gt;أنا مطوّر ويب مبتدئ أتعلم HTML وCSS وJavaScript.&lt;/p&gt;&lt;/body&gt;"></iframe>
+      </div>
+
+      <div class="example-card">
+        <h4><code>&lt;a href="..."&gt;</code> — رابط تشعبي</h4>
+        <span class="ex-note">خاصية <code>href</code> إجبارية، وهي تحدد وجهة الرابط.</span>
+        <pre><code>&lt;a href="https://www.google.com"&gt;اذهب إلى جوجل&lt;/a&gt;</code></pre>
+        <div class="ex-label">الناتج (قابل للنقر)</div>
+        <iframe class="example-preview-frame" title="مثال a" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;a href='https://www.google.com' style='color:#1a56db;'&gt;اذهب إلى جوجل&lt;/a&gt;&lt;/body&gt;"></iframe>
+      </div>
+
+      <div class="example-card">
+        <h4><code>&lt;ul&gt;</code> / <code>&lt;li&gt;</code> — قائمة غير مرتبة</h4>
+        <span class="ex-note"><code>ul</code> هي الحاوية، و<code>li</code> كل عنصر بداخلها.</span>
+        <pre><code>&lt;ul&gt;
+  &lt;li&gt;القراءة&lt;/li&gt;
+  &lt;li&gt;البرمجة&lt;/li&gt;
+  &lt;li&gt;الرياضة&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        <div class="ex-label">الناتج</div>
+        <iframe class="example-preview-frame" title="مثال ul" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;ul style='margin:0;padding-inline-start:20px;'&gt;&lt;li&gt;القراءة&lt;/li&gt;&lt;li&gt;البرمجة&lt;/li&gt;&lt;li&gt;الرياضة&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;"></iframe>
+      </div>
+
+      <div class="example-card">
+        <h4><code>&lt;img src="..." alt="..."&gt;</code> — صورة</h4>
+        <span class="ex-note">وسم بلا إغلاق. <code>src</code> مصدر الصورة، <code>alt</code> نص بديل لو لم تُحمّل.</span>
+        <pre><code>&lt;img src="https://placehold.co/300x120"
+     alt="صورة توضيحية"&gt;</code></pre>
+        <div class="ex-label">الناتج</div>
+        <iframe class="example-preview-frame" title="مثال img" srcdoc="&lt;body style='margin:0;padding:10px;font-family:sans-serif;'&gt;&lt;img src='https://placehold.co/300x120' alt='صورة توضيحية' style='max-width:100%;border-radius:6px;'&gt;&lt;/body&gt;"></iframe>
+      </div>
+
+      <h3>ملاحظة مهمة</h3>
+      <p>كل وسم (Tag) عادة له بداية <code>&lt;p&gt;</code> ونهاية <code>&lt;/p&gt;</code>. المحتوى يوضع بينهما. جرّب الآن في المحرر المجاور 👉</p>
+    </section>
+
+    <div class="playground">
+      <div class="panel">
+        <div class="panel-head">
+          <span>✎ محرر الكود</span>
+          <button id="resetBtn">إعادة تعيين</button>
+        </div>
+        <textarea id="codeInput" dir="ltr" spellcheck="false"><!DOCTYPE html>
+<html>
+<head>
+  <title>صفحتي الأولى</title>
+</head>
+<body>
+  <!-- اكتب كودك هنا -->
+
+</body>
+</html></textarea>
+      </div>
+      <div class="panel preview-panel">
+        <div class="panel-head"><span>المعاينة الحية</span></div>
+        <iframe id="preview" title="معاينة حية"></iframe>
+      </div>
+    </div>
+  </main>
+
+  <section class="exercises">
+    <h2><span class="eyebrow">تطبيق عملي</span>تحديات المستوى الأول</h2>
+    <p style="margin-top:-6px;">أكمل الكود في المحرر أعلاه حتى تُحقق كل تحدٍ، ثم اضغط "تحقق من الحل".</p>
+
+    <div class="exercise-grid" id="exerciseGrid">
+      <div class="exercise" data-ex="1">
+        <div class="status">1</div>
+        <div class="body"><strong>عنوان باسمك</strong><span>أضف <code>&lt;h1&gt;</code> يحتوي على اسمك.</span></div>
+      </div>
+      <div class="exercise" data-ex="2">
+        <div class="status">2</div>
+        <div class="body"><strong>فقرة تعريفية</strong><span>أضف <code>&lt;p&gt;</code> تصف نفسك في جملة واحدة.</span></div>
+      </div>
+      <div class="exercise" data-ex="3">
+        <div class="status">3</div>
+        <div class="body"><strong>رابط</strong><span>أضف <code>&lt;a href="..."&gt;</code> يشير لموقعك المفضل.</span></div>
+      </div>
+      <div class="exercise" data-ex="4">
+        <div class="status">4</div>
+        <div class="body"><strong>قائمة</strong><span>أضف <code>&lt;ul&gt;</code> بها 3 عناصر <code>&lt;li&gt;</code> على الأقل (مثلاً هواياتك).</span></div>
+      </div>
+      <div class="exercise" data-ex="5">
+        <div class="status">5</div>
+        <div class="body"><strong>صورة</strong><span>أضف <code>&lt;img src="..." alt="..."&gt;</code> بخاصيتي src وalt.</span></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="checkBtn">تحقق من الحل ✅</button>
+      <span id="checkStatus"></span>
+    </div>
+
+    <div class="congrats" id="congrats" hidden>
+      <h3>🎉 أحسنت! أنهيت المستوى الأول</h3>
+      <p>تعرفت الآن على بنية HTML والعناصر الأساسية. قل لي "أعطني المستوى الثاني" عندما تكون جاهزًا للمتابعة إلى النماذج والجداول والفيديو.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const codeInput = document.getElementById('codeInput');
+  const preview = document.getElementById('preview');
+  const resetBtn = document.getElementById('resetBtn');
+  const checkBtn = document.getElementById('checkBtn');
+  const checkStatus = document.getElementById('checkStatus');
+  const congrats = document.getElementById('congrats');
+  const progressCount = document.getElementById('progressCount');
+  const ring = document.getElementById('ring');
+  const RING_LEN = 188.4;
+
+  const starter = codeInput.value;
+
+  function renderPreview(){
+    preview.srcdoc = codeInput.value;
+  }
+  let t;
+  codeInput.addEventListener('input', () => {
+    clearTimeout(t);
+    t = setTimeout(renderPreview, 250);
+  });
+  renderPreview();
+
+  resetBtn.addEventListener('click', () => {
+    codeInput.value = starter;
+    renderPreview();
+  });
+
+  function parseCode(){
+    const parser = new DOMParser();
+    return parser.parseFromString(codeInput.value, 'text/html');
+  }
+
+  function checkAll(){
+    const doc = parseCode();
+    const results = {};
+
+    const h1 = doc.querySelector('h1');
+    results[1] = !!(h1 && h1.textContent.trim().length > 0);
+
+    const p = doc.querySelector('p');
+    results[2] = !!(p && p.textContent.trim().length > 3);
+
+    const a = doc.querySelector('a[href]');
+    results[3] = !!(a && a.getAttribute('href') && a.getAttribute('href').trim().length > 1);
+
+    const items = doc.querySelectorAll('ul li, ol li');
+    results[4] = items.length >= 3;
+
+    const img = doc.querySelector('img[src][alt]');
+    results[5] = !!(img && img.getAttribute('src').trim().length > 0 && img.getAttribute('alt').trim().length > 0);
+
+    let doneCount = 0;
+    Object.keys(results).forEach(key => {
+      const card = document.querySelector('.exercise[data-ex="' + key + '"]');
+      if(results[key]){
+        card.classList.add('done');
+        card.querySelector('.status').textContent = '✓';
+        doneCount++;
+      } else {
+        card.classList.remove('done');
+        card.querySelector('.status').textContent = key;
+      }
+    });
+
+    progressCount.textContent = doneCount;
+    const offset = RING_LEN - (RING_LEN * (doneCount/5));
+    ring.style.strokeDashoffset = offset;
+
+    if(doneCount === 5){
+      checkStatus.textContent = 'رائع! أكملت كل التحديات.';
+      congrats.hidden = false;
+    } else {
+      checkStatus.textContent = 'أنجزت ' + doneCount + ' من 5 — كمّل الباقي وحاول مجددًا.';
+      congrats.hidden = true;
+    }
+  }
+
+  checkBtn.addEventListener('click', checkAll);
+</script>
+</body>
+</html>
